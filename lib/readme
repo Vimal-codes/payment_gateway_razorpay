@@ -1,0 +1,75 @@
+### Simplified Steps for Razorpay Integration in Flutter
+
+**Step 1: Add the Razorpay Package**
+- Add the `razorpay_flutter` package to your `pubspec.yaml` file:
+  ```yaml
+  dependencies:
+    razorpay_flutter: ^1.3.0
+  ```
+
+**Step 2: Update Android `build.gradle`**
+- In `android/app/build.gradle`, set the `minSdkVersion` to at least 19:
+  ```groovy
+  defaultConfig {
+      minSdkVersion 21
+  }
+  ```
+
+**Step 3: Create a Payment Page**
+- Create a new page (`PaymentPage`) and add Razorpay-related code. Add the instance
+  late Razorpay _razorpay;
+
+**Step 4: Initialize Razorpay in `initState`**
+- Create an instance of `Razorpay` in the `initState` method and register event handlers:
+  ```dart
+  @override
+  void initState() {
+    super.initState();
+    _razorpay = Razorpay();
+    _razorpay.on(Razorpay.EVENT_PAYMENT_ERROR, _handlePaymentErrorResponse);
+    _razorpay.on(Razorpay.EVENT_PAYMENT_SUCCESS, _handlePaymentSuccessResponse);
+    _razorpay.on(Razorpay.EVENT_EXTERNAL_WALLET, _handlePaymentWalletResponse);
+  }
+  ```
+
+**Step 5: Dispose Razorpay**
+- Clear the Razorpay instance in the `dispose` method to avoid memory leaks:
+  ```dart
+  @override
+  void dispose() {
+    super.dispose();
+    _razorpay.clear();
+  }
+  ```
+
+**Step 6: Create a Function for Razorpay Options**
+- Add a function to define payment options and call Razorpay:
+  ```dart
+  void openCheckOut(double amount, String name, String description, String contact, String email) {
+    var options = {
+      'key': 'rzp_live_yourKeyHere', // Replace with your Razorpay key
+      'amount': amount * 100, // Amount in paise (1 INR = 100 paise)
+      'name': name,
+      'description': description,
+      'prefill': {'contact': contact, 'email': email},
+      'external': {'wallets': ['paytm']}
+    };
+    _razorpay.open(options);
+  }
+  ```
+
+**Step 7: Open Razorpay Checkout**
+- Call the `openCheckOut` function from your UI to trigger payment:
+  ```dart
+  ElevatedButton(
+    onPressed: () {
+      openCheckOut(1000, "Shop Name", "Payment Description", "1234567890", "example@gmail.com");
+    },
+    child: const Text("Pay"),
+  );
+  ```
+
+**Step 8: Pass Values Dynamically**
+- Use the button to pass dynamic values like name, email, and phone number to the `openCheckOut` function.
+
+---
